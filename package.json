@@ -1,0 +1,10 @@
+{
+  "name": "zoomer",
+  "description": "null",
+  "version": "1.0.0",
+  "main" : "index.js",
+  "dependencies": {
+    "yargs-parser": "19.0.1",
+    "colors": "1.4.0"
+  }
+}
