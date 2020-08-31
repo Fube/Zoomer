@@ -16,7 +16,9 @@ const colors = require('colors');
 const arg = require('yargs-parser');
 const { readFileSync } = require('fs');
 const readline = require('readline');
+const { exec } = require('child_process');
 const rl = readline.createInterface({input : process.stdin, output : process.stdout});
+const { sorter, addCron } = require('./autoJoin.js');
 
 //Helper functions
 const genColor = (function* (){
@@ -31,24 +33,23 @@ const genColor = (function* (){
     for(let color = 0;;color++)
         yield COLORS[color % COLORS.length];
 })();
-const sorter = {
-    "Monday": 1,
-    "Tuesday": 2,
-    "Wednesday": 3,
-    "Thursday": 4,
-    "Friday": 5,
-};
 function format(string, len){
     return string.padEnd(len, " ");
 }
-function print({ name, start, end, zoom }, v, color = genColor.next().value){
+function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().value){
+
+    const {id, pwd, link} = zoom;
 
     let foo = "\t"+format(name, 20);
 
     if(v){
-        foo += format(` from ${start} to ${end}`, 50);
+        /* 
+         * Is it hard to read? Yea.
+         * Do you need to understand it? Too bad.
+         */
+        foo += format(`${format(` from ${start} to ${end}`, 25)} ${format(autojoin?'will':"won't", 5)} autojoin`, 50);
     }
-    foo += format(`:${zoom.id}, ${zoom.pwd}`, 20);
+    foo += format(`${id}\t${pwd}\t${link}`, 20);
     console.log(foo[color]);
 }
 function getDay(){
@@ -62,26 +63,41 @@ function toNum(s, z = new Date()){
     return z;
 }
 
+
+
 //Main
 (() =>{
 
     const { courses } = JSON.parse(readFileSync(PATH));
     let BY_DAY = new Map();
 
-    for(const { name, teacher, when, zoom } of courses){
+    for(const { name, teacher, when, zoom, autojoin } of courses){
 
-        const { id, pwd } = zoom;
-        const betterId = id.replace(/\s/g, '');
+        let id, pwd, link;
+        if(zoom){
+            id = zoom.id;
+            pwd = zoom.pwd;
+            link = zoom.link;
+        }
         
         for(const foo of when){
             
             const [day, [start, end]] = foo;
+            
+            if(!zoom){
+                id = foo[2][0];
+                pwd = foo[2][1];
+                link = foo[2][2];
+            }
+            const betterId = id.replace(/\s/g, '');
 
             if(BY_DAY.has(day)){
-                BY_DAY.get(day).push({ name, start, end, zoom: {id : betterId, pwd} });
+                BY_DAY.get(day).push({ name, start, end, zoom: {id : betterId, pwd, link}, autojoin});
             }else{
-                BY_DAY.set(day, [{ name, start, end, zoom: {id : betterId, pwd} }]);
+                BY_DAY.set(day, [{ name, start, end, zoom: {id : betterId, pwd, link}, autojoin }]);
             }
+            if(autojoin)
+                addCron(sorter[day], start, link);
         }
     }
 
@@ -180,6 +196,7 @@ function parseCommand(name, opts){
             core : function(){
                 console.log('Goodbye');
                 rl.close();
+                process.exit(0);
             }
         }
     }

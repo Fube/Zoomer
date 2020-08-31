@@ -1,6 +1,6 @@
-#*Zoomer*
-##Because remembering is hard
-####Example of expected JSON format:
+# *Zoomer*
+## Because remembering is hard
+#### Example of expected JSON format:
 ```javascript
 {
     "courses" : [
