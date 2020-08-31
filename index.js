@@ -10,7 +10,7 @@ const PATH = ``;
 
 /**
  * Imports
- * NOTE: you just need to install colors and yargs-parser
+ * NOTE: you just need to install colors, node-cron and yargs-parser
  */
 const colors = require('colors');
 const arg = require('yargs-parser');
