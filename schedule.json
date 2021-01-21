@@ -1,0 +1,252 @@
+{
+    "courses":[
+       {
+          "name":"Humanities for Professional Programs",
+          "teacher":"Panagiota (Pota) Kanavaros",
+          "when":[
+             [
+                "Monday",
+                [
+                   "08:00",
+                   "09:30"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/89059118783"
+                ]
+             ],
+             [
+                "Wednesday",
+                [
+                   "08:00",
+                   "09:30"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/89059118783"
+                ]
+             ]
+          ],
+          "autojoin": true
+       },
+       {
+          "name":"Web Development with PHP",
+          "teacher":"Laura Marianella Zapata Aspiazu",
+          "when":[
+             [
+                "Monday",
+                [
+                   "12:30",
+                   "14:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/98712323025?pwd=WXdxcW1kWmZ1Y3FldkVGWFBhaWFJUT09#success"
+                ]
+             ],
+             [
+                "Thursday",
+                [
+                   "12:30",
+                   "14:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/98712323025?pwd=WXdxcW1kWmZ1Y3FldkVGWFBhaWFJUT09#success"
+                ]
+             ]
+          ],
+          "autojoin": true
+       },
+       {
+          "name":"Systems Analysis and Design",
+          "teacher":"MD Istiaque Shahriar",
+          "when":[
+             [
+                "Monday",
+                [
+                   "14:00",
+                   "15:30"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/94014811202"
+                ]
+             ],
+             [
+                "Wednesday",
+                [
+                   "11:00",
+                   "12:30"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/94014811202"
+                ]
+             ],
+             [
+                "Thursday",
+                [
+                   "16:00",
+                   "18:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/94014811202"
+                ]
+             ]
+          ],
+          "autojoin": true
+       },
+       {
+          "name":"Fit For Life",
+          "teacher":"Marc Dagenais",
+          "when":[
+             [
+                "Tuesday",
+                [
+                   "08:00",
+                   "10:00"
+                ],
+                [
+                   "",
+                   "",
+                   "zoomURL"
+                ]
+             ]
+          ],
+          "autojoin": true
+       },
+       {
+          "name":"Game Development with the Unity Cross-Platform Game Engine",
+          "teacher":"Reza Mirsalari",
+          "when":[
+             [
+                "Tuesday",
+                [
+                   "12:00",
+                   "14:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/81516161359?pwd=UURZU1h5MitkUWxMWHhCSmlYeHRqZz09"
+                ]
+             ],
+             [
+                "Friday",
+                [
+                   "08:00",
+                   "10:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/81516161359?pwd=UURZU1h5MitkUWxMWHhCSmlYeHRqZz09URL"
+                ]
+             ]
+          ],
+          "autojoin": true
+       },
+       {
+          "name":"Studies in Theme",
+          "teacher":"Amanda Perry",
+          "when":[
+             [
+                "Tuesday",
+                [
+                   "14:00",
+                   "16:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/82051729030?pwd=VmxxZWhBNHBjQ2c1ZFZXOFFnaWdPQT09"
+                ]
+             ],
+             [
+                "Thursday",
+                [
+                   "14:00",
+                   "16:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/82051729030?pwd=VmxxZWhBNHBjQ2c1ZFZXOFFnaWdPQT09"
+                ]
+             ]
+          ],
+          "autojoin": true
+       },
+       {
+          "name":"Web Services and Distributed Computing",
+          "teacher":"Christine Gerard",
+          "when":[
+             [
+                "Wednesday",
+                [
+                   "14:30",
+                   "16:30"
+                ],
+                [
+                   "",
+                   "",
+                   "zoomURL"
+                ]
+             ],
+             [
+                "Friday",
+                [
+                   "14:00",
+                   "16:00"
+                ],
+                [
+                   "",
+                   "",
+                   "zoomURL"
+                ]
+             ]
+          ],
+          "autojoin": true
+       },
+       {
+          "name":"Mobile Application Development 1: Android",
+          "teacher":"MD Istiaque Shahriar",
+          "when":[
+             [
+                "Wednesday",
+                [
+                   "16:30",
+                   "18:30"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/82507589777"
+                ]
+             ],
+             [
+                "Friday",
+                [
+                   "10:00",
+                   "12:00"
+                ],
+                [
+                   "",
+                   "",
+                   "https://us02web.zoom.us/j/82507589777"
+                ]
+             ]
+          ],
+          "autojoin": true
+       }
+    ]
+ }

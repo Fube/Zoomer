@@ -1,21 +1,18 @@
 /**
- * TODO: Comment
- */
-
-/**
- * Absolute path to your schedule represented as a json.
+ * Path to your schedule represented as a json.
  * See README for the expected structure
  */
-const PATH = ``;
+const PATH = ``
 
 /**
  * Imports
- * NOTE: you just need to install colors, node-cron and yargs-parser
+ * NOTE: you just need to install colors and yargs-parser
  */
 const colors = require('colors');
 const arg = require('yargs-parser');
 const { readFileSync } = require('fs');
 const readline = require('readline');
+const { exec } = require('child_process');
 const rl = readline.createInterface({input : process.stdin, output : process.stdout});
 const { sorter, addCron } = require('./autoJoin.js');
 
@@ -52,6 +49,8 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     console.log(foo[color]);
 }
 function getDay(){
+    console.log('\n\n\nI GOT CALLED\n\n\n')
+    console.log(Object.entries(sorter)[new Date().getDay() - 1][0])
     return Object.entries(sorter)[new Date().getDay() - 1][0];
 }
 function toNum(s, z = new Date()){
@@ -97,7 +96,7 @@ function toNum(s, z = new Date()){
             }
             if(autojoin){
                 addCron(sorter[day], start, link);
-            }
+			}
         }
     }
 
@@ -107,7 +106,7 @@ function toNum(s, z = new Date()){
 
     rl.on('line', e => {
 
-        let { _: command, d = "", v = false, a = false} = arg(e);
+        let { _: command, d = "", v = false, a = false } = arg(e);
 
         const DAYS = Object.keys(sorter);
 
