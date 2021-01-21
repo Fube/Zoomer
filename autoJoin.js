@@ -8,6 +8,8 @@ const sorter = {
     "Friday": 5,
     "Saturday": 6
 };
+const { exec } = require('child_process');
+
 const browser = n => exec(`${(process.platform == 'darwin'? 'open': process.platform == 'win32'? 'start': 'xdg-open')} ${n}`);
 /**
  * 

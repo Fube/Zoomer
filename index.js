@@ -16,7 +16,6 @@ const colors = require('colors');
 const arg = require('yargs-parser');
 const { readFileSync } = require('fs');
 const readline = require('readline');
-const { exec } = require('child_process');
 const rl = readline.createInterface({input : process.stdin, output : process.stdout});
 const { sorter, addCron } = require('./autoJoin.js');
 
@@ -96,8 +95,9 @@ function toNum(s, z = new Date()){
             }else{
                 BY_DAY.set(day, [{ name, start, end, zoom: {id : betterId, pwd, link}, autojoin }]);
             }
-            if(autojoin)
+            if(autojoin){
                 addCron(sorter[day], start, link);
+            }
         }
     }
 
