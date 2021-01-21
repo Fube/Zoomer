@@ -2,7 +2,7 @@
  * Path to your schedule represented as a json.
  * See README for the expected structure
  */
-const PATH = ``
+const PATH = `C:\\Users\\Nariman\\Desktop\\JSProjects\\Zoomer\\schedule.json`
 
 /**
  * Imports
@@ -49,8 +49,6 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     console.log(foo[color]);
 }
 function getDay(){
-    console.log('\n\n\nI GOT CALLED\n\n\n')
-    console.log(Object.entries(sorter)[new Date().getDay() - 1][0])
     return Object.entries(sorter)[new Date().getDay() - 1][0];
 }
 function toNum(s, z = new Date()){
