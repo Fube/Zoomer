@@ -32,8 +32,6 @@ function addCron(day, start, link, offset=0){
         min = '0'+String(min)
     }
 
-    console.log(`Queued for ${hour}:${min}`)
-
     new CronJob({
 
         cronTime : `00 ${min} ${hour} * * ${day}`,
