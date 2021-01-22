@@ -15,6 +15,7 @@ const readline = require('readline');
 const { exec } = require('child_process');
 const rl = readline.createInterface({input : process.stdin, output : process.stdout});
 const { sorter, addCron } = require('./autoJoin.js');
+const sprintf = require('sprintfjs');
 
 //Helper functions
 const genColor = (function* (){
@@ -36,17 +37,15 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
 
     const {id, pwd, link} = zoom;
 
-    let foo = "\t"+format(name, 20);
-
     if(v){
-        /* 
-         * Is it hard to read? Yea.
-         * Do you need to understand it? Too bad.
-         */
-        foo += format(`${format(` from ${start} to ${end}`, 25)} ${format(autojoin?'will':"won't", 5)} autojoin`, 50);
+
+        const willOrWont = autojoin && 'will' || "won't";
+        const toPrint = sprintf('\t%-80s from %-4s\tto\t%-4s\t%-8s\tautojoin %-20s %-20s %-50s', name, start, end, willOrWont, id, pwd, link);
+        return console.log(toPrint[color]);
     }
-    foo += format(`${id}\t${pwd}\t${link}`, 20);
-    console.log(foo[color]);
+
+    const toPrint = sprintf('\t%-80s%-20s%-20s%-50s', name, id, pwd, link)
+    console.log(toPrint[color]);
 }
 function getDay(){
     return Object.entries(sorter)[new Date().getDay() - 1][0];
