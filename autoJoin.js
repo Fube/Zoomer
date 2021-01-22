@@ -28,6 +28,11 @@ function addCron(day, start, link, offset=0){
     let [hour, min] = start.split`:`.map(Number);
     let foobar = hour*60+min-offset;
     [hour, min] = [Math.floor(foobar/60), foobar%60];
+    if(String(min).length === 1){
+        min = '0'+String(min)
+    }
+
+    console.log(`Queued for ${hour}:${min}`)
 
     new CronJob({
 
