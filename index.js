@@ -2,7 +2,7 @@
  * Path to your schedule represented as a json.
  * See README for the expected structure
  */
-const PATH = `C:\\Users\\Nariman\\Desktop\\JSProjects\\Zoomer\\schedule.json`
+const PATH = `C:\\Users\\Nariman\\Google Drive\\Sem6\\schedule.json`
 
 /**
  * Imports
@@ -63,7 +63,7 @@ function toNum(s, z = new Date()){
 //Main
 (() =>{
 
-    const { courses } = JSON.parse(readFileSync(PATH));
+    const { courses, offset } = JSON.parse(readFileSync(PATH));
     let BY_DAY = new Map();
 
     for(const { name, teacher, when, zoom, autojoin } of courses){
@@ -92,7 +92,7 @@ function toNum(s, z = new Date()){
                 BY_DAY.set(day, [{ name, start, end, zoom: {id : betterId, pwd, link}, autojoin }]);
             }
             if(autojoin){
-                addCron(sorter[day], start, link);
+                addCron(sorter[day], start, link, offset);
 			}
         }
     }

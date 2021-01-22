@@ -12,9 +12,11 @@ const browser = n => exec(`${(process.platform == 'darwin'? 'open': process.plat
 /**
  * 
  * @param {Number} day Integer representing the day. Sunday is 0. I'm sure you can figure out the rest.
- * @param {Array.<{start: String, link: String,}>} courses Must contain a start and a link. The start is formated as such: hour:minutes. I'm sure you know what a link is
+ * @param {String} start A string formatted as HH:mm
+ * @param {String} link You know what a link is
+ * @param {Number} offset A integer representing how early you should join (in minutes)
  */
-function addCron(day, start, link){
+function addCron(day, start, link, offset=0){
 
     /**
      * This should work on Linux, Mac and Windows. 
@@ -23,7 +25,10 @@ function addCron(day, start, link){
      * Or don't. Just don't complain to me.
      */
 
-    const [hour, min] = start.split`:`;
+    const [hour, min] = start.split`:`.map(Number);
+    let foobar = hour*60+min-offset;
+    [hour, min] = [Math.floor(foobar/60), foobar%60];
+
     new CronJob({
 
         cronTime : `00 ${min} ${hour} * * ${day}`,
