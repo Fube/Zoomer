@@ -25,7 +25,7 @@ function addCron(day, start, link, offset=0){
      * Or don't. Just don't complain to me.
      */
 
-    const [hour, min] = start.split`:`.map(Number);
+    let [hour, min] = start.split`:`.map(Number);
     let foobar = hour*60+min-offset;
     [hour, min] = [Math.floor(foobar/60), foobar%60];
 
