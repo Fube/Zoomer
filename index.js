@@ -40,7 +40,7 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     if(v){
 
         const willOrWont = autojoin && 'will' || "won't";
-        const toPrint = sprintf('\t%-80s from %-4s\tto\t%-4s\t%-8s\tautojoin %-20s %-20s %-50s', name, start, end, willOrWont, id, pwd, link);
+        const toPrint = sprintf('\t%-80s from %-4s\tto\t%-4s\t%-8s autojoin %-20s %-20s %-50s', name, start, end, willOrWont, id, pwd, link);
         return console.log(toPrint[color]);
     }
 
