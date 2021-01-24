@@ -2,7 +2,7 @@
  * Path to your schedule represented as a json.
  * See README for the expected structure
  */
-const PATH = `C:\\Users\\Nariman\\Google Drive\\Sem6\\schedule.json`
+const PATH = `./schedule.json`
 
 /**
  * Imports
@@ -48,7 +48,7 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     console.log(toPrint[color]);
 }
 function getDay(){
-    return Object.entries(sorter)[new Date().getDay() - 1][0];
+    return Object.entries(sorter)[new Date().getDay()][0];
 }
 function toNum(s, z = new Date()){
 
@@ -178,9 +178,8 @@ function parseCommand(name, opts){
             reqOpt : null,
             aliases : ['t', 'tod', 'td', 'day'],
             core : function(){
-
                 with(this)
-                    for(const course of BY_DAY.get(getDay()))
+                    for(const course of BY_DAY.get(getDay()) || [{name: 'Nothing', zoom: { id:'', pwd:'', link:'' }}])
                         print(course, v);
                     
                 
