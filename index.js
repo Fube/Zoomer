@@ -2,7 +2,7 @@
  * Path to your schedule represented as a json.
  * See README for the expected structure
  */
-const PATH = `./schedule.json`
+const PATH = `/home/nariman/Desktop/Zoomer/schedule.json`
 
 /**
  * Imports
@@ -17,6 +17,9 @@ const rl = readline.createInterface({input : process.stdin, output : process.std
 const { sorter, addCron } = require('./autoJoin.js');
 const sprintf = require('sprintfjs');
 
+// Used to display the user has no classes
+const EMPTY_DAY = {name: 'Nothing', zoom: { id:'', pwd:'', link:'' }};
+
 //Helper functions
 const genColor = (function* (){
 
@@ -30,9 +33,11 @@ const genColor = (function* (){
     for(let color = 0;;color++)
         yield COLORS[color % COLORS.length];
 })();
+
 function format(string, len){
     return string.padEnd(len, " ");
 }
+
 function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().value){
 
     const {id, pwd, link} = zoom;
@@ -47,9 +52,11 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     const toPrint = sprintf('\t%-80s%-20s%-20s%-50s', name, id, pwd, link)
     console.log(toPrint[color]);
 }
-function getDay(){
-    return Object.entries(sorter)[new Date().getDay()][0];
+
+function getDay(offset=0){
+    return Object.entries(sorter)[(new Date().getDay() + offset) % 7][0];
 }
+
 function toNum(s, z = new Date()){
 
     const [hour, min] = s.split`:`;
@@ -57,8 +64,6 @@ function toNum(s, z = new Date()){
     z.setMinutes(min);
     return z;
 }
-
-
 
 //Main
 (() =>{
@@ -101,10 +106,12 @@ function toNum(s, z = new Date()){
 
     BY_DAY = new Map([...BY_DAY].sort((a, b) => sorter[a[0]] - sorter[b[0]]));
 
-    rl.on('line', e => {
+    // Check if running in daemon mode or not
+
+    function callParse(e){
 
         let { _: command, d = "", v = false, a = false } = arg(e);
-
+    
         const DAYS = Object.keys(sorter);
 
         d = DAYS.find(n => new  RegExp(d.toLowerCase()).test(n.toLowerCase()));
@@ -115,8 +122,17 @@ function toNum(s, z = new Date()){
         delete OPTS.BY_DAY;
 
         parseCommand(command, OPTS).call(CONT);
+    }
+    rl.on('line', callParse);
 
-    });
+    const dx = process.argv.includes('dx');
+
+    if(dx){
+
+        callParse(process.argv.slice(3).join` `);
+        rl.close();
+        process.exit(0);
+    }
 })();
 
 function parseCommand(name, opts){
@@ -169,20 +185,34 @@ function parseCommand(name, opts){
                             if(toNum(c.start, new Date(foo)) > foo)
                                 print(c, v);
                     }
-                    else
-                        print(today.find(({ start }) => toNum(start, new Date(foo)) > foo), v);
+                    else{
+
+                        const rest = today.find( ({ start }) => toNum(start, new Date(foo)) > foo) || EMPTY_DAY;
+                        print(rest, v);
+                    }
                 }
             }
         },
         today : {
             reqOpt : null,
-            aliases : ['t', 'tod', 'td', 'day'],
+            aliases : ['tod', 'td', 'day'],
             core : function(){
                 with(this)
-                    for(const course of BY_DAY.get(getDay()) || [{name: 'Nothing', zoom: { id:'', pwd:'', link:'' }}])
+                    for(const course of BY_DAY.get(getDay()) || [ EMPTY_DAY ])
                         print(course, v);
                     
                 
+            }
+        },
+        tomorrow: {
+
+            reqOpt : null,
+            aliases : ['tm', 'tmr', 'tmrw', 'tomorrow'],
+            core : function(){
+
+                with(this)
+                    for(const course of BY_DAY.get(getDay(1)) || [ EMPTY_DAY ])
+                        print(course, v);
             }
         },
         exit : {
