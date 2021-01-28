@@ -1,3 +1,6 @@
+const { time } = require('cron');
+const { DateTime } = require('luxon');
+
 const sorter = {
     "Sunday": 0,
     "Monday": 1,
@@ -34,6 +37,19 @@ function dateToNum(source, target = new Date()){
     return target;
 }
 
+/**
+ * Shorthand for [Luxon's DateTime]{@link DateTime} fromFormat
+ *
+ * @param {string} timeAsString Time formatted as HH:mm String
+ * @returns {DateTime}
+ */
+const dateTimeFromString = (timeAsString) => {
+
+    const HHmm = DateTime.fromFormat(timeAsString, 'HH:mm');
+    const Hmm = DateTime.fromFormat(timeAsString, 'H:mm');
+
+    return HHmm.ordinal ? HHmm : Hmm;
+};
 
 module.exports = {
 
@@ -41,4 +57,5 @@ module.exports = {
     getDay: (offset=0) => Object.entries(sorter)[(new Date().getDay() + offset) % 7][0],
     genColor,
     dateToNum,
+    dateTimeFromString,
 };

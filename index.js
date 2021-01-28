@@ -18,16 +18,14 @@ const sprintf = require('sprintfjs');
 const { DateTime } = require('luxon');
 
 const { addCron } = require('./autoJoin.js');
-const { sorter, getDay, genColor, dateToNum: toNum } = require('./commons/index.js');
+const { sorter, getDay, genColor, dateToNum: toNum, dateTimeFromString } = require('./commons/index.js');
 const Course = require('./classes/Course');
 const Zoom = require('./classes/Zoom.js');
 const Schedule = require('./classes/Schedule');
 const When = require('./classes/When');
 
 //Helper functions
-function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().value){
-
-    const {id, pwd, link} = zoom;
+function print({ name, when: { start, end }, zoom: { id, pwd, link } , autojoin }, v, color = genColor.next().value){
 
     if(v){
 
@@ -78,15 +76,6 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
             const _zoom = new Zoom(betterId, pwd, link);
             const _when = new When(day, start, end);
             const _course = new Course(teacher, name, _zoom, _when, autojoin);
-
-            // if(BY_DAY.has(day)){
-            //     BY_DAY.get(day).push(_course);
-            // }else{
-            //     BY_DAY.set(day, [_course]);
-            // }
-            // if(autojoin){
-            //     addCron(sorter[day], start, link, offset);
-            // }
     
             _courses.push(_course);
         }
@@ -127,6 +116,8 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     }
 
     schedule.cleanCourses();
+
+    BY_DAY.forEach(n => n.forEach(c => addCronWithContextualOffset(c, BY_DAY, offset)))
     
 })();
 
@@ -244,10 +235,20 @@ function addCronWithContextualOffset(course, BY_DAY, offset){
     const { day, start } = course.when;
 
     const coursesToday = BY_DAY.get(day).filter(n => n !== course);
-    courses.sort((a, b) => toNum(a.start) - toNum(b.start)); // Sort courses by their start time
-    for(const _course of courses){
+    coursesToday.sort((a, b) => toNum(a.when.start) - toNum(b.when.start)); // Sort courses by their start time
 
-        const a = 1;
+    let isBackd = false;
+    for(const { when, name } of coursesToday){
+
+        const minusd = dateTimeFromString(start);
+        const dStart = dateTimeFromString(when.start);
+        const dEnd = dateTimeFromString(when.end);
+
+        if(dStart <= minusd && minusd <= dEnd){
+            isBackd = true;
+            break;
+        }
     }
 
+    addCron(sorter[day], start, course.zoom.link, isBackd?0:offset)
 }
