@@ -53,10 +53,13 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     const { courses, offset } = JSON.parse(readFileSync(PATH));
 
     /**
-     * @type {Map<string, Course>}
+     * Map of days and courses within that day
+     * 
+     * @type {Map<string, [Course]>}
      */
     let BY_DAY = new Map();
 
+    // Parses schedule from the JSON and loads the data into the Schedule object
     for(const { name, teacher, when, zoom, autojoin } of courses){
 
         let betterId = null;
