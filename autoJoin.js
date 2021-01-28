@@ -1,13 +1,6 @@
 const { CronJob } = require('cron');
-const sorter = {
-    "Sunday": 0,
-    "Monday": 1,
-    "Tuesday": 2,
-    "Wednesday": 3,
-    "Thursday": 4,
-    "Friday": 5,
-    "Saturday": 6,
-};
+const { sorter } = require('./commons');
+
 const { exec } = require('child_process');
 
 const browser = n => exec(`${(process.platform == 'darwin'? 'open': process.platform == 'win32'? 'start': 'xdg-open')} ${n}`);

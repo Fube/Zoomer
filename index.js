@@ -2,7 +2,7 @@
  * Path to your schedule represented as a json.
  * See README for the expected structure
  */
-const PATH = `/home/nariman/Desktop/Zoomer/schedule.json`
+const PATH = `./schedule.json`
 
 /**
  * Imports
@@ -16,28 +16,11 @@ const { exec } = require('child_process');
 const rl = readline.createInterface({input : process.stdin, output : process.stdout});
 const { sorter, addCron } = require('./autoJoin.js');
 const sprintf = require('sprintfjs');
+const { getDay, genColor, dateToNum: toNum } = require('./commons/index.js');
+const Course = require('./classes/Course');
 
-// Used to display the user has no classes
-const EMPTY_DAY = {name: 'Nothing', zoom: { id:'', pwd:'', link:'' }};
 
 //Helper functions
-const genColor = (function* (){
-
-    const COLORS = [
-        "brightGreen",
-        "brightYellow",
-        "brightMagenta",
-        "brightCyan",
-		
-    ];
-    for(let color = 0;;color++)
-        yield COLORS[color % COLORS.length];
-})();
-
-function format(string, len){
-    return string.padEnd(len, " ");
-}
-
 function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().value){
 
     const {id, pwd, link} = zoom;
@@ -53,20 +36,17 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     console.log(toPrint[color]);
 }
 
-function getDay(offset=0){
-    return Object.entries(sorter)[(new Date().getDay() + offset) % 7][0];
-}
 
-function toNum(s, z = new Date()){
-
-    const [hour, min] = s.split`:`;
-    z.setHours(hour);
-    z.setMinutes(min);
-    return z;
-}
 
 //Main
 (() =>{
+
+    /**
+     * @type {[Course]}
+     */
+    const courses = [];
+    
+    const Schedule = new Schedule();
 
     const { courses, offset } = JSON.parse(readFileSync(PATH));
     let BY_DAY = new Map();
