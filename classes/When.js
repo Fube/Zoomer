@@ -68,5 +68,3 @@ const { sorter } = require('../commons');
 }
 
 module.exports = When;
-
-const a = new When();

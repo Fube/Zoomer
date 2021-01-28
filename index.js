@@ -18,6 +18,8 @@ const { sorter, addCron } = require('./autoJoin.js');
 const sprintf = require('sprintfjs');
 const { getDay, genColor, dateToNum: toNum } = require('./commons/index.js');
 const Course = require('./classes/Course');
+const Zoom = require('./classes/Zoom.js');
+const Schedule = require('./classes/Schedule');
 
 
 //Helper functions
@@ -44,15 +46,20 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
     /**
      * @type {[Course]}
      */
-    const courses = [];
+    const _courses = [];
     
-    const Schedule = new Schedule();
+    const schedule = new Schedule(_courses);
 
     const { courses, offset } = JSON.parse(readFileSync(PATH));
+
+    /**
+     * @type {Map<string, Course>}
+     */
     let BY_DAY = new Map();
 
     for(const { name, teacher, when, zoom, autojoin } of courses){
 
+        let betterId = null;
         let id, pwd, link;
         if(zoom){
             id = zoom.id;
@@ -69,7 +76,8 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
                 pwd = foo[2][1];
                 link = foo[2][2];
             }
-            const betterId = id.replace(/\s/g, '');
+
+            betterId = id.replace(/\s/g, '');
 
             if(BY_DAY.has(day)){
                 BY_DAY.get(day).push({ name, start, end, zoom: {id : betterId, pwd, link}, autojoin});
@@ -80,6 +88,10 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
                 addCron(sorter[day], start, link, offset);
 			}
         }
+
+        const _zoom = new Zoom(betterId, pwd, link);
+        const _course = new Course(teacher, name, _zoom, when, autojoin);
+        _courses.push(_course);
     }
 
     BY_DAY.forEach(x => x.sort(({ start }, { start:start2 }) => toNum(start) - toNum(start2)));
@@ -113,6 +125,9 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
         rl.close();
         process.exit(0);
     }
+
+    schedule.cleanCourses();
+    
 })();
 
 function parseCommand(name, opts){
@@ -122,7 +137,7 @@ function parseCommand(name, opts){
     const commands = {
         dotw : {
             reqOpt : ['d'],
-            aliases : ['dtw'],
+            aliases : ['dtw', 'dotw'],
             core : function(){
 
                 with(this){
@@ -167,7 +182,7 @@ function parseCommand(name, opts){
                     }
                     else{
 
-                        const rest = today.find( ({ start }) => toNum(start, new Date(foo)) > foo) || EMPTY_DAY;
+                        const rest = today.find( ({ start }) => toNum(start, new Date(foo)) > foo) || Course.EMPTY_DAY;
                         print(rest, v);
                     }
                 }
@@ -178,7 +193,7 @@ function parseCommand(name, opts){
             aliases : ['tod', 'td', 'day'],
             core : function(){
                 with(this)
-                    for(const course of BY_DAY.get(getDay()) || [ EMPTY_DAY ])
+                    for(const course of BY_DAY.get(getDay()) || [ Course.EMPTY_DAY ])
                         print(course, v);
                     
                 
@@ -191,7 +206,7 @@ function parseCommand(name, opts){
             core : function(){
 
                 with(this)
-                    for(const course of BY_DAY.get(getDay(1)) || [ EMPTY_DAY ])
+                    for(const course of BY_DAY.get(getDay(1)) || [ Course.EMPTY_DAY ])
                         print(course, v);
             }
         },

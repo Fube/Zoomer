@@ -16,6 +16,13 @@ class Schedule {
      */
     get courses(){return this.#courses;}
     set courses(courses){this.#courses = courses}
+
+    /**
+     * Ensures that courses does not contain null or undefined values
+     */
+    cleanCourses(){
+        this.#courses = this.#courses.filter(n => n !== null && n !== undefined)
+    }
 }
 
 module.exports = Schedule;
