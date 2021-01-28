@@ -1,4 +1,3 @@
-const fields = ['day', 'start', 'end'];
 const { sorter } = require('../commons');
 
 

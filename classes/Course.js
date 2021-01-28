@@ -18,7 +18,7 @@ class Course{
     /**
      * 
      * @param {Zoom} zoom 
-     * @param {[When]} when 
+     * @param {When} when 
      */
     constructor(teacher, name, zoom, when, autoJoin){
 

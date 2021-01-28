@@ -2,7 +2,7 @@
  * Path to your schedule represented as a json.
  * See README for the expected structure
  */
-const PATH = `./schedule.json`
+const PATH = `/home/nariman/Desktop/Zoomer/schedule.json`
 
 /**
  * Imports
@@ -14,13 +14,15 @@ const { readFileSync } = require('fs');
 const readline = require('readline');
 const { exec } = require('child_process');
 const rl = readline.createInterface({input : process.stdin, output : process.stdout});
-const { sorter, addCron } = require('./autoJoin.js');
 const sprintf = require('sprintfjs');
-const { getDay, genColor, dateToNum: toNum } = require('./commons/index.js');
+const { DateTime } = require('luxon');
+
+const { addCron } = require('./autoJoin.js');
+const { sorter, getDay, genColor, dateToNum: toNum } = require('./commons/index.js');
 const Course = require('./classes/Course');
 const Zoom = require('./classes/Zoom.js');
 const Schedule = require('./classes/Schedule');
-
+const When = require('./classes/When');
 
 //Helper functions
 function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().value){
@@ -48,21 +50,13 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
      */
     const _courses = [];
     
+    /**@type {Schedule} */
     const schedule = new Schedule(_courses);
 
     const { courses, offset } = JSON.parse(readFileSync(PATH));
 
-    /**
-     * Map of days and courses within that day
-     * 
-     * @type {Map<string, [Course]>}
-     */
-    let BY_DAY = new Map();
-
     // Parses schedule from the JSON and loads the data into the Schedule object
     for(const { name, teacher, when, zoom, autojoin } of courses){
-
-        let betterId = null;
         let id, pwd, link;
         if(zoom){
             id = zoom.id;
@@ -80,26 +74,29 @@ function print({ name, start, end, zoom, autojoin }, v, color = genColor.next().
                 link = foo[2][2];
             }
 
-            betterId = id.replace(/\s/g, '');
+            const betterId = id.replace(/\s/g, '');
+            const _zoom = new Zoom(betterId, pwd, link);
+            const _when = new When(day, start, end);
+            const _course = new Course(teacher, name, _zoom, _when, autojoin);
 
-            if(BY_DAY.has(day)){
-                BY_DAY.get(day).push({ name, start, end, zoom: {id : betterId, pwd, link}, autojoin});
-            }else{
-                BY_DAY.set(day, [{ name, start, end, zoom: {id : betterId, pwd, link}, autojoin }]);
-            }
-            if(autojoin){
-                addCron(sorter[day], start, link, offset);
-			}
+            // if(BY_DAY.has(day)){
+            //     BY_DAY.get(day).push(_course);
+            // }else{
+            //     BY_DAY.set(day, [_course]);
+            // }
+            // if(autojoin){
+            //     addCron(sorter[day], start, link, offset);
+            // }
+    
+            _courses.push(_course);
         }
-
-        const _zoom = new Zoom(betterId, pwd, link);
-        const _course = new Course(teacher, name, _zoom, when, autojoin);
-        _courses.push(_course);
     }
 
-    BY_DAY.forEach(x => x.sort(({ start }, { start:start2 }) => toNum(start) - toNum(start2)));
+    let BY_DAY = schedule.toMap();
 
-    BY_DAY = new Map([...BY_DAY].sort((a, b) => sorter[a[0]] - sorter[b[0]]));
+    BY_DAY.forEach(x => x.sort((a, b) => toNum(a.when.start) - toNum(b.when.start)));
+
+    BY_DAY = new Map([...BY_DAY].sort((a, b) => sorter[a[0]] - sorter[b[0]])); // Sort by day
 
     // Check if running in daemon mode or not
 
@@ -143,12 +140,11 @@ function parseCommand(name, opts){
             aliases : ['dtw', 'dotw'],
             core : function(){
 
-                with(this){
-                    console.log('\n');
-                    for(const foo of BY_DAY.get(d)){
-                        print(foo, v)
-                    }
-                }
+                const { d, v, BY_DAY } = this;
+
+                console.log('\n');
+                for(const foo of BY_DAY.get(d))
+                    print(foo, v);
             }
         },
         all : {
@@ -156,13 +152,11 @@ function parseCommand(name, opts){
             aliases : ['a'],
             core : function(){
 
-                with(this){
-                    for(const [day, content] of BY_DAY){
+                for(const [day, content] of this.BY_DAY){
 
-                        const { value: color } = genColor.next();
-                        console.log(day[color]);
-                        content.forEach(n => print(n, true, color));
-                    }
+                    const { value: color } = genColor.next();
+                    console.log(day[color]);
+                    content.forEach(n => print(n, true, color));
                 }
             }
         },
@@ -171,35 +165,36 @@ function parseCommand(name, opts){
             aliases : ['n'],
             core : function(){
 
-                with(this){
+                const { a, v, BY_DAY } = this;
 
-                    const foo = new Date();
-                    const 
-                        today = BY_DAY.get(getDay()),
-                        [hour, minute] = [foo.getHours(), foo.getDay()];
 
-                    if(a){
-                        for(const c of today)
-                            if(toNum(c.start, new Date(foo)) > foo)
-                                print(c, v);
-                    }
-                    else{
+                const foo = new Date();
+                /**@type {Course} */
+                const today = BY_DAY.get(getDay());
+                const [hour, minute] = [foo.getHours(), foo.getDay()];
 
-                        const rest = today.find( ({ start }) => toNum(start, new Date(foo)) > foo) || Course.EMPTY_DAY;
-                        print(rest, v);
-                    }
+                if(a){
+                    for(const c of today)
+                        if(toNum(c.start, new Date(foo)) > foo)
+                            print(c, v);
                 }
+                else{
+
+                    const rest = today.find( ({ when: { start } }) => toNum(start, new Date(foo)) > foo) || Course.EMPTY_DAY;
+                    print(rest, v);
+                }
+                
             }
         },
         today : {
             reqOpt : null,
             aliases : ['tod', 'td', 'day'],
             core : function(){
-                with(this)
-                    for(const course of BY_DAY.get(getDay()) || [ Course.EMPTY_DAY ])
-                        print(course, v);
-                    
-                
+
+                const { v, BY_DAY } = this;
+
+                for(const course of BY_DAY.get(getDay()) || [ Course.EMPTY_DAY ])
+                    print(course, v);
             }
         },
         tomorrow: {
@@ -208,15 +203,17 @@ function parseCommand(name, opts){
             aliases : ['tm', 'tmr', 'tmrw', 'tomorrow'],
             core : function(){
 
-                with(this)
-                    for(const course of BY_DAY.get(getDay(1)) || [ Course.EMPTY_DAY ])
-                        print(course, v);
+                const { v, BY_DAY } = this;
+
+                for(const course of BY_DAY.get(getDay(1)) || [ Course.EMPTY_DAY ])
+                    print(course, v);
             }
         },
         exit : {
             reqOpt : null,
             aliases : ['e', 'c', 'close', 'done'],
             core : function(){
+
                 console.log('Goodbye');
                 rl.close();
                 process.exit(0);
@@ -234,4 +231,23 @@ function parseCommand(name, opts){
     }
 
     return () => console.log('Invalid input');
+}
+
+/**
+ * Adds course to Cron with offset if it isn't a back to back course
+ * 
+ * @param {Course} course Course to add to Cron for autojoin
+ * @param {Map<string, [Course]>} BY_DAY Map of Courses aggregated by days of the week 
+ */
+function addCronWithContextualOffset(course, BY_DAY, offset){
+
+    const { day, start } = course.when;
+
+    const coursesToday = BY_DAY.get(day).filter(n => n !== course);
+    courses.sort((a, b) => toNum(a.start) - toNum(b.start)); // Sort courses by their start time
+    for(const _course of courses){
+
+        const a = 1;
+    }
+
 }
