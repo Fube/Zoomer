@@ -7,26 +7,26 @@
 class Zoom{
 
     #id;
-    #password;
+    #pwd;
     #link;
 
     /**
      * 
      * @param {string} id 
-     * @param {string} password 
+     * @param {string} pwd 
      * @param {string} link 
      */
-    constructor(id, password, link){
+    constructor(id, pwd, link){
 
         if(typeof id === 'string'){
 
             this.#id = id;
-            this.#password = password;
+            this.#pwd = pwd;
             this.#link = link;
         }
         else{
             this.#id = id.id;
-            this.#password = id.password;
+            this.#pwd = id.pwd;
             this.#link = id.link;
         }
     }
@@ -47,7 +47,7 @@ class Zoom{
      * @memberof Zoom
      * @returns {string}
      */
-    get password(){return this.#password}
+    get pwd(){return this.#pwd}
 
     /**
      *
